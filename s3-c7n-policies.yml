@@ -1,0 +1,38 @@
+policies:
+  - name: config-rule-s3-buckets-without-encryption
+    resource: s3
+    description: |
+      create a config rule for s3 buckets without any encryption
+    filters:
+      - type: bucket-encryption
+        state: False
+
+  - name: config-rule-s3-buckets-with-public-access
+    resource: s3
+    filters:
+      - type: check-public-block
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+
+  - name: s3-required-cat-application
+    comment: s3 non-compliant for tag missing cat:application
+    resource: s3
+    filters:
+        - "tag:cat:application": absent
+
+  - name: s3-required-cat-owner
+    comment: s3 non-compliant for tag missing cat:owner
+    resource: s3
+    filters:
+        - "tag:cat:owner": absent
+  
+  - name: s3-required-tag-environment
+    comment: s3 non-compliant for tag missing app:environment
+    resource: s3
+    filters:
+        - type: value
+          key: "tag:app:environment"
+          op: not-in
+          value: ['dev', 'test', 'prod']
+        - or:
+            - "tag:app:environment": absent
